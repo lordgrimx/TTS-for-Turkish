@@ -18,6 +18,10 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
     # TSV dosyasını oku ve içeriğini kontrol et
     print("\nTSV dosyası okunuyor...")
     df = pd.read_csv(tsv_path, sep='\t')
+    
+    # Path sütunundaki yolları düzelt
+    df['path'] = df['path'].apply(lambda x: os.path.basename(x))  # Sadece dosya adını al
+    
     print(f"TSV dosyası içeriği (ilk 5 satır):\n{df.head()}")
     print(f"Toplam satır sayısı: {len(df)}")
     
@@ -41,6 +45,7 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
     valid_paths = []
     valid_sentences = []
     error_count = 0
+    success_count = 0
     
     print("\nSes dosyaları işleniyor...")
     for idx, row in tqdm(df.iterrows(), total=len(df)):
@@ -68,6 +73,11 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
             # Add to valid entries
             valid_paths.append(row['path'])
             valid_sentences.append(row['sentence'])
+            success_count += 1
+            
+            # Her 1000 başarılı işlemde bir rapor ver
+            if success_count % 1000 == 0:
+                print(f"\nBaşarılı işlem sayısı: {success_count}")
             
         except Exception as e:
             if error_count < 5:  # Sadece ilk 5 hatayı göster
