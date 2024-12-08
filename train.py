@@ -50,7 +50,7 @@ def train_tts_model(metadata_path, output_path):
     # Init model
     model = Tacotron2(config)
 
-    # Init the trainer and 🚀
+    # Init the trainer and 
     trainer = Trainer(
         TrainingArgs(),
         config,
@@ -63,6 +63,7 @@ def train_tts_model(metadata_path, output_path):
     trainer.fit()
 
 if __name__ == "__main__":
-    metadata_path = "preprocessed_data/metadata.csv"
-    output_path = "output"
+    # Google Drive paths
+    metadata_path = "/content/drive/MyDrive/turkish_tts_data/preprocessed_data/metadata.csv"
+    output_path = "/content/drive/MyDrive/turkish_tts_data/output"
     train_tts_model(metadata_path, output_path)

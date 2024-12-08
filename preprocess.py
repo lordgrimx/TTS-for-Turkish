@@ -56,7 +56,8 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
     return metadata_path
 
 if __name__ == "__main__":
-    tsv_path = "train.tsv"
-    clips_folder = "clips"
-    output_folder = "preprocessed_data"
+    # Google Drive paths
+    tsv_path = "/content/drive/MyDrive/turkish_tts_data/train.tsv"
+    clips_folder = "/content/drive/MyDrive/turkish_tts_data/clips"
+    output_folder = "/content/drive/MyDrive/turkish_tts_data/preprocessed_data"
     preprocess_dataset(tsv_path, clips_folder, output_folder)
