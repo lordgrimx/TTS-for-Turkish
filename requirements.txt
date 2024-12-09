@@ -4,7 +4,7 @@ numpy==1.22.4
 torch==2.1.2+cu121
 torchaudio==2.1.2+cu121
 pandas==1.5.3
-librosa==0.8.0
+librosa
 soundfile==0.12.1
 tqdm==4.65.0
 matplotlib==3.7.1
