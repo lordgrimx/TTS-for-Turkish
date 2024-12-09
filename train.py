@@ -6,7 +6,6 @@ from TTS.tts.configs.shared_configs import BaseDatasetConfig
 from TTS.tts.configs.vits_config import VitsConfig
 from TTS.tts.models.vits import Vits
 from TTS.tts.utils.text.tokenizer import TTSTokenizer
-from TTS.utils.audio import AudioProcessor
 
 def train_tts_model(metadata_path, output_path):
     """
