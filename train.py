@@ -1,6 +1,6 @@
 import os
 import torch
-from TTS.utils.io import load_config
+import json
 from TTS.utils.audio import AudioProcessor
 from TTS.tts.utils.generic_utils import setup_model
 from TTS.tts.utils.text.symbols import symbols, phonemes
@@ -8,6 +8,20 @@ from TTS.tts.utils.synthesis import synthesis
 from TTS.tts.utils.visual import plot_spectrogram
 from TTS.tts.datasets import load_meta_data
 from TTS.tts.utils.managers import BaseTTSManager
+
+def load_config(config_path):
+    """Load config from a json file"""
+    with open(config_path, 'r') as f:
+        return AttrDict(json.load(f))
+
+class AttrDict(dict):
+    """A dictionary that allows for attribute-style access"""
+    def __init__(self, *args, **kwargs):
+        super(AttrDict, self).__init__(*args, **kwargs)
+        self.__dict__ = self
+        for key, value in self.items():
+            if isinstance(value, dict):
+                self[key] = AttrDict(value)
 
 def train_tts_model(metadata_path, output_path):
     """
@@ -18,6 +32,8 @@ def train_tts_model(metadata_path, output_path):
     
     # Load config
     config = load_config("config.json")
+    if not hasattr(config, 'audio'):
+        config.audio = AttrDict()
     config.audio.sample_rate = 22050
     
     # Init audio processor
