@@ -6,6 +6,24 @@ import soundfile as sf
 import traceback
 import time
 
+def read_tsv_in_chunks(tsv_path, max_samples=1000, chunksize=100):
+    """
+    TSV dosyasını parça parça okur
+    """
+    print("\nTSV dosyası parça parça okunuyor...")
+    chunks = []
+    try:
+        for chunk in pd.read_csv(tsv_path, sep='\t', chunksize=chunksize):
+            chunks.append(chunk)
+            if len(pd.concat(chunks)) >= max_samples:
+                break
+        return pd.concat(chunks).head(max_samples)
+    except Exception as e:
+        print(f"TSV dosyası okunurken hata oluştu: {str(e)}")
+        print("Hata detayı:")
+        print(traceback.format_exc())
+        return None
+
 def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
     """
     Preprocess the dataset by validating audio files and creating a cleaned metadata file.
@@ -17,12 +35,11 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
     # Create output folder if it doesn't exist
     os.makedirs(output_folder, exist_ok=True)
     
-    # TSV dosyasını oku ve içeriğini kontrol et
-    print("\nTSV dosyası okunuyor...")
-    df = pd.read_csv(tsv_path, sep='\t')
-    
-    # İlk 1000 veriyi al
-    df = df.head(max_samples)
+    # TSV dosyasını parça parça oku
+    df = read_tsv_in_chunks(tsv_path, max_samples)
+    if df is None:
+        print("TSV dosyası okunamadı. İşlem durduruluyor.")
+        return None
     
     # Path sütunundaki yolları düzelt
     df['path'] = df['path'].apply(lambda x: os.path.basename(x))  # Sadece dosya adını al
