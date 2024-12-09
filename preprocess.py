@@ -4,7 +4,7 @@ from tqdm import tqdm
 import librosa
 import soundfile as sf
 
-def preprocess_dataset(tsv_path, clips_folder, output_folder):
+def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
     """
     Preprocess the dataset by validating audio files and creating a cleaned metadata file.
     """
@@ -19,11 +19,14 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
     print("\nTSV dosyası okunuyor...")
     df = pd.read_csv(tsv_path, sep='\t')
     
+    # İlk 1000 veriyi al
+    df = df.head(max_samples)
+    
     # Path sütunundaki yolları düzelt
     df['path'] = df['path'].apply(lambda x: os.path.basename(x))  # Sadece dosya adını al
     
     print(f"TSV dosyası içeriği (ilk 5 satır):\n{df.head()}")
-    print(f"Toplam satır sayısı: {len(df)}")
+    print(f"İşlenecek toplam satır sayısı: {len(df)}")
     
     # İlk ses dosyasının yolunu kontrol et
     if len(df) > 0:
@@ -75,8 +78,8 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
             valid_sentences.append(row['sentence'])
             success_count += 1
             
-            # Her 1000 başarılı işlemde bir rapor ver
-            if success_count % 1000 == 0:
+            # Her 100 başarılı işlemde bir rapor ver
+            if success_count % 100 == 0:
                 print(f"\nBaşarılı işlem sayısı: {success_count}")
             
         except Exception as e:
@@ -99,7 +102,7 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder):
     cleaned_df.to_csv(metadata_path, index=False)
     
     print(f"\nİşlem tamamlandı:")
-    print(f"- Toplam dosya sayısı: {len(df)}")
+    print(f"- İşlenen toplam dosya sayısı: {len(df)}")
     print(f"- Başarıyla işlenen dosya sayısı: {len(valid_paths)}")
     print(f"- Hatalı dosya sayısı: {error_count}")
     return metadata_path
@@ -109,4 +112,4 @@ if __name__ == "__main__":
     tsv_path = "/content/drive/MyDrive/turkish_tts_data/train.tsv"
     clips_folder = "/content/drive/MyDrive/turkish_tts_data/clips"
     output_folder = "/content/drive/MyDrive/turkish_tts_data/preprocessed_data"
-    preprocess_dataset(tsv_path, clips_folder, output_folder)
+    preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000)  # Sadece ilk 1000 veriyi işle
