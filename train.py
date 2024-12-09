@@ -1,12 +1,12 @@
 import os
 import torch
+from TTS.trainer import Trainer, TrainerArgs
+from TTS.utils.audio import AudioProcessor
 from TTS.tts.configs.shared_configs import BaseDatasetConfig
 from TTS.tts.configs.vits_config import VitsConfig
 from TTS.tts.models.vits import Vits
-from TTS.tts.utils.managers import BaseTTSManager
 from TTS.tts.utils.text.tokenizer import TTSTokenizer
 from TTS.utils.audio import AudioProcessor
-from trainer import Trainer, TrainerArgs
 
 def train_tts_model(metadata_path, output_path):
     """
@@ -44,7 +44,7 @@ def train_tts_model(metadata_path, output_path):
         run_eval=True,
         test_delay_epochs=-1,
         epochs=1000,
-        text_cleaner="phoneme_cleaners",
+        text_cleaner="turkish_cleaners",
         use_phonemes=True,
         phoneme_language="tr",
         phoneme_cache_path=os.path.join(output_path, "phoneme_cache"),
