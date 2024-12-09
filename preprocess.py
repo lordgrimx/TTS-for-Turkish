@@ -3,6 +3,8 @@ import pandas as pd
 from tqdm import tqdm
 import librosa
 import soundfile as sf
+import traceback
+import time
 
 def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
     """
@@ -61,9 +63,35 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
                     print(f"\nDosya bulunamadı: {audio_path}")
                 error_count += 1
                 continue
+            
+            # Dosya boyutunu kontrol et
+            file_size = os.path.getsize(audio_path)
+            if file_size == 0:
+                print(f"\nUyarı: {audio_path} dosyası boş (0 byte)")
+                error_count += 1
+                continue
                 
             # Load and validate audio file
-            audio, sr = librosa.load(audio_path, sr=22050)
+            start_time = time.time()
+            try:
+                audio, sr = librosa.load(audio_path, sr=22050, timeout=30)  # 30 saniyelik timeout ekle
+            except Exception as e:
+                print(f"\nHata: {audio_path} dosyası yüklenirken zaman aşımı veya hata oluştu:")
+                print(f"Hata detayı: {str(e)}")
+                print(f"Dosya boyutu: {file_size} bytes")
+                error_count += 1
+                continue
+            
+            load_time = time.time() - start_time
+            if load_time > 5:  # 5 saniyeden uzun süren yüklemeleri raporla
+                print(f"\nUyarı: {audio_path} dosyasının yüklenmesi {load_time:.2f} saniye sürdü")
+            
+            # Ses dosyasının uzunluğunu kontrol et
+            duration = len(audio) / sr
+            if duration > 30:  # 30 saniyeden uzun ses dosyalarını atla
+                print(f"\nUyarı: {audio_path} dosyası çok uzun ({duration:.2f} saniye)")
+                error_count += 1
+                continue
             
             # Normalize audio
             audio = librosa.util.normalize(audio)
@@ -83,9 +111,10 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
                 print(f"\nBaşarılı işlem sayısı: {success_count}")
             
         except Exception as e:
-            if error_count < 5:  # Sadece ilk 5 hatayı göster
-                print(f"\nHata: {audio_path} dosyası işlenirken sorun oluştu:")
-                print(f"Hata detayı: {str(e)}")
+            print(f"\nHata: {audio_path} dosyası işlenirken beklenmeyen bir hata oluştu:")
+            print(f"Hata detayı: {str(e)}")
+            print("Hata izleme:")
+            print(traceback.format_exc())
             error_count += 1
             continue
     
