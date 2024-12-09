@@ -1,6 +1,8 @@
-TTS==0.22.0
-numpy==1.23.5
-torch==2.0.1
+TTS==0.8.0
+numpy==1.22.0
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.1.2+cu121
+torchaudio==2.1.2+cu121
 pandas==1.5.3
 librosa==0.10.0
 soundfile==0.12.1

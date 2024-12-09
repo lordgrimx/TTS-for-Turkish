@@ -1,0 +1,66 @@
+{
+    "model": "tacotron2",
+    "run_name": "turkish_tts",
+    "run_description": "Turkish TTS model using Tacotron2",
+    
+    "audio": {
+        "sample_rate": 22050,
+        "win_length": 1024,
+        "hop_length": 256,
+        "num_mels": 80,
+        "mel_fmin": 0,
+        "mel_fmax": 8000,
+        "preemphasis": 0.97,
+        "ref_level_db": 20,
+        "power": 1.5,
+        "griffin_lim_iters": 60
+    },
+
+    "use_phonemes": true,
+    "phoneme_language": "tr",
+    "text_cleaner": "turkish_cleaners",
+    "phoneme_cache_path": "phoneme_cache",
+
+    "batch_size": 32,
+    "eval_batch_size": 16,
+    "num_loader_workers": 4,
+    "num_eval_loader_workers": 4,
+    "run_eval": true,
+    "test_delay_epochs": -1,
+    "epochs": 1000,
+    "print_step": 25,
+    "print_eval": true,
+    "mixed_precision": true,
+
+    "tacotron2_params": {
+        "memory_size": -1,
+        "prenet_type": "original",
+        "prenet_dropout": true,
+        "prenet_dropout_p": 0.5,
+        "encoder_type": "original",
+        "encoder_params": {
+            "kernel_size": 5,
+            "num_conv_layers": 3,
+            "conv_padding": 2,
+            "conv_channels": 512,
+            "conv_dropout_p": 0.5,
+            "blstm_size": 512
+        },
+        "attention_type": "original",
+        "attention_params": {
+            "attention_dim": 128,
+            "attention_filters": 32,
+            "attention_kernel": 31
+        },
+        "decoder_params": {
+            "decoder_rnn_dim": 1024,
+            "decoder_layers": 2,
+            "r": 5,
+            "attention_norm": "sigmoid",
+            "prenet_dim": 256,
+            "max_decoder_steps": 1000,
+            "stopnet": true,
+            "stopnet_pos_weight": 10
+        }
+    }
+}
