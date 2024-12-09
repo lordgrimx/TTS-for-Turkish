@@ -5,6 +5,7 @@ import librosa
 import soundfile as sf
 import traceback
 import time
+import numpy as np
 
 def read_tsv_in_chunks(tsv_path, max_samples=1000, chunksize=100):
     """
@@ -23,6 +24,25 @@ def read_tsv_in_chunks(tsv_path, max_samples=1000, chunksize=100):
         print("Hata detayı:")
         print(traceback.format_exc())
         return None
+
+def load_audio_safe(file_path, sr=22050, max_duration=30):
+    """
+    Ses dosyasını güvenli bir şekilde yükler
+    """
+    try:
+        # Önce soundfile ile metadata oku (hızlı)
+        info = sf.info(file_path)
+        
+        # Dosya çok uzunsa baştan kes
+        if info.duration > max_duration:
+            frames_to_read = int(max_duration * sr)
+            audio, actual_sr = librosa.load(file_path, sr=sr, duration=max_duration)
+        else:
+            audio, actual_sr = librosa.load(file_path, sr=sr)
+        
+        return audio, actual_sr
+    except Exception as e:
+        raise Exception(f"Ses dosyası yüklenemedi: {str(e)}")
 
 def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
     """
@@ -91,9 +111,9 @@ def preprocess_dataset(tsv_path, clips_folder, output_folder, max_samples=1000):
             # Load and validate audio file
             start_time = time.time()
             try:
-                audio, sr = librosa.load(audio_path, sr=22050, timeout=30)  # 30 saniyelik timeout ekle
+                audio, sr = load_audio_safe(audio_path, sr=22050, max_duration=30)
             except Exception as e:
-                print(f"\nHata: {audio_path} dosyası yüklenirken zaman aşımı veya hata oluştu:")
+                print(f"\nHata: {audio_path} dosyası yüklenirken hata oluştu:")
                 print(f"Hata detayı: {str(e)}")
                 print(f"Dosya boyutu: {file_size} bytes")
                 error_count += 1
